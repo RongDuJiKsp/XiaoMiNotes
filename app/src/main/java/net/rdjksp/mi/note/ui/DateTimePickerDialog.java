@@ -31,10 +31,10 @@ import android.text.format.DateUtils;
 
 public class DateTimePickerDialog extends AlertDialog implements OnClickListener {
 
-    private Calendar mDate = Calendar.getInstance();
+    private final Calendar mDate = Calendar.getInstance();
     private boolean mIs24HourView;
     private OnDateTimeSetListener mOnDateTimeSetListener;
-    private DateTimePicker mDateTimePicker;
+    private final DateTimePicker mDateTimePicker;
 
     public interface OnDateTimeSetListener {
         void OnDateTimeSet(AlertDialog dialog, long date);
@@ -44,16 +44,13 @@ public class DateTimePickerDialog extends AlertDialog implements OnClickListener
         super(context);
         mDateTimePicker = new DateTimePicker(context);
         setView(mDateTimePicker);
-        mDateTimePicker.setOnDateTimeChangedListener(new OnDateTimeChangedListener() {
-            public void onDateTimeChanged(DateTimePicker view, int year, int month,
-                    int dayOfMonth, int hourOfDay, int minute) {
-                mDate.set(Calendar.YEAR, year);
-                mDate.set(Calendar.MONTH, month);
-                mDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                mDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                mDate.set(Calendar.MINUTE, minute);
-                updateTitle(mDate.getTimeInMillis());
-            }
+        mDateTimePicker.setOnDateTimeChangedListener((view, year, month, dayOfMonth, hourOfDay, minute) -> {
+            mDate.set(Calendar.YEAR, year);
+            mDate.set(Calendar.MONTH, month);
+            mDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            mDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            mDate.set(Calendar.MINUTE, minute);
+            updateTitle(mDate.getTimeInMillis());
         });
         mDate.setTimeInMillis(date);
         mDate.set(Calendar.SECOND, 0);

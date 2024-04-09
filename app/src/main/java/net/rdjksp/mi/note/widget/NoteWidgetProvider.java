@@ -34,6 +34,7 @@ import net.rdjksp.mi.note.ui.NotesListActivity;
 
 /**
  * widget是安卓桌面小组件 该抽象类提供了基本的小组件功能方法
+ * @author YuQi_Zhou
  */
 public abstract class NoteWidgetProvider extends AppWidgetProvider {
     public static final String [] PROJECTION = new String [] {

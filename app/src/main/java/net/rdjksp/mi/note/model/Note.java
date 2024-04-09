@@ -33,10 +33,13 @@ import net.rdjksp.mi.note.data.Notes.TextNote;
 
 import java.util.ArrayList;
 
-
+/**
+ * model层的 Note 对象 定义了note的基本内容
+ * @author YuQi_Zhou
+ */
 public class Note {
-    private ContentValues mNoteDiffValues;
-    private NoteData mNoteData;
+    private final ContentValues mNoteDiffValues;
+    private final NoteData mNoteData;
     private static final String TAG = "Note";
     /**
      * Create a new note id for adding a new note to databases
@@ -52,11 +55,11 @@ public class Note {
         values.put(NoteColumns.PARENT_ID, folderId);
         Uri uri = context.getContentResolver().insert(Notes.CONTENT_NOTE_URI, values);
 
-        long noteId = 0;
+        long noteId;
         try {
-            noteId = Long.valueOf(uri.getPathSegments().get(1));
+            noteId = Long.parseLong(uri.getPathSegments().get(1));
         } catch (NumberFormatException e) {
-            Log.e(TAG, "Get note id error :" + e.toString());
+            Log.e(TAG, "Get note id error :" + e);
             noteId = 0;
         }
         if (noteId == -1) {
@@ -109,10 +112,10 @@ public class Note {
             return true;
         }
 
-        /**
-         * In theory, once data changed, the note should be updated on {@link NoteColumns#LOCAL_MODIFIED} and
-         * {@link NoteColumns#MODIFIED_DATE}. For data safety, though update note fails, we also update the
-         * note data info
+        /*
+          In theory, once data changed, the note should be updated on {@link NoteColumns#LOCAL_MODIFIED} and
+          {@link NoteColumns#MODIFIED_DATE}. For data safety, though update note fails, we also update the
+          note data info
          */
         if (context.getContentResolver().update(
                 ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId), mNoteDiffValues, null,
@@ -122,22 +125,18 @@ public class Note {
         }
         mNoteDiffValues.clear();
 
-        if (mNoteData.isLocalModified()
-                && (mNoteData.pushIntoContentResolver(context, noteId) == null)) {
-            return false;
-        }
-
-        return true;
+        return !mNoteData.isLocalModified()
+                || (mNoteData.pushIntoContentResolver(context, noteId) != null);
     }
 
     private class NoteData {
         private long mTextDataId;
 
-        private ContentValues mTextDataValues;
+        private final ContentValues mTextDataValues;
 
         private long mCallDataId;
 
-        private ContentValues mCallDataValues;
+        private final ContentValues mCallDataValues;
 
         private static final String TAG = "NoteData";
 
@@ -179,15 +178,15 @@ public class Note {
         }
 
         Uri pushIntoContentResolver(Context context, long noteId) {
-            /**
-             * Check for safety
+            /*
+              Check for safety
              */
             if (noteId <= 0) {
                 throw new IllegalArgumentException("Wrong note id:" + noteId);
             }
 
-            ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
-            ContentProviderOperation.Builder builder = null;
+            ArrayList<ContentProviderOperation> operationList = new ArrayList<>();
+            ContentProviderOperation.Builder builder;
 
             if(mTextDataValues.size() > 0) {
                 mTextDataValues.put(DataColumns.NOTE_ID, noteId);
@@ -196,7 +195,9 @@ public class Note {
                     Uri uri = context.getContentResolver().insert(Notes.CONTENT_DATA_URI,
                             mTextDataValues);
                     try {
-                        setTextDataId(Long.valueOf(uri.getPathSegments().get(1)));
+                        if (uri != null) {
+                            setTextDataId(Long.parseLong(uri.getPathSegments().get(1)));
+                        }
                     } catch (NumberFormatException e) {
                         Log.e(TAG, "Insert new text data fail with noteId" + noteId);
                         mTextDataValues.clear();
@@ -218,7 +219,9 @@ public class Note {
                     Uri uri = context.getContentResolver().insert(Notes.CONTENT_DATA_URI,
                             mCallDataValues);
                     try {
-                        setCallDataId(Long.valueOf(uri.getPathSegments().get(1)));
+                        if (uri != null) {
+                            setCallDataId(Long.parseLong(uri.getPathSegments().get(1)));
+                        }
                     } catch (NumberFormatException e) {
                         Log.e(TAG, "Insert new call data fail with noteId" + noteId);
                         mCallDataValues.clear();
@@ -237,13 +240,10 @@ public class Note {
                 try {
                     ContentProviderResult[] results = context.getContentResolver().applyBatch(
                             Notes.AUTHORITY, operationList);
-                    return (results == null || results.length == 0 || results[0] == null) ? null
+                    return results.length == 0 || results[0] == null ? null
                             : ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, noteId);
-                } catch (RemoteException e) {
-                    Log.e(TAG, String.format("%s: %s", e.toString(), e.getMessage()));
-                    return null;
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, String.format("%s: %s", e.toString(), e.getMessage()));
+                } catch (RemoteException | OperationApplicationException e) {
+                    Log.e(TAG, String.format("%s: %s", e, e.getMessage()));
                     return null;
                 }
             }

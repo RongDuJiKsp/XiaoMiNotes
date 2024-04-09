@@ -63,7 +63,7 @@ public class BackupUtils {
     // Backup or restore success
     public static final int STATE_SUCCESS                      = 4;
 
-    private TextExport mTextExport;
+    private final TextExport mTextExport;
 
     private BackupUtils(Context context) {
         mTextExport = new TextExport(context);
@@ -121,7 +121,7 @@ public class BackupUtils {
         private static final int FORMAT_NOTE_DATE            = 1;
         private static final int FORMAT_NOTE_CONTENT         = 2;
 
-        private Context mContext;
+        private final Context mContext;
         private String mFileName;
         private String mFileDirectory;
 
@@ -150,9 +150,9 @@ public class BackupUtils {
                 if (notesCursor.moveToFirst()) {
                     do {
                         // Print note's last modified date
-                        ps.println(String.format(getFormat(FORMAT_NOTE_DATE), DateFormat.format(
+                        ps.printf((getFormat(FORMAT_NOTE_DATE)) + "%n", DateFormat.format(
                                 mContext.getString(R.string.format_datetime_mdhm),
-                                notesCursor.getLong(NOTE_COLUMN_MODIFIED_DATE))));
+                                notesCursor.getLong(NOTE_COLUMN_MODIFIED_DATE)));
                         // Query data belong to this note
                         String noteId = notesCursor.getString(NOTE_COLUMN_ID);
                         exportNoteToText(noteId, ps);
@@ -182,23 +182,23 @@ public class BackupUtils {
                             String location = dataCursor.getString(DATA_COLUMN_CONTENT);
 
                             if (!TextUtils.isEmpty(phoneNumber)) {
-                                ps.println(String.format(getFormat(FORMAT_NOTE_CONTENT),
-                                        phoneNumber));
+                                ps.printf((getFormat(FORMAT_NOTE_CONTENT)) + "%n",
+                                        phoneNumber);
                             }
                             // Print call date
-                            ps.println(String.format(getFormat(FORMAT_NOTE_CONTENT), DateFormat
+                            ps.printf((getFormat(FORMAT_NOTE_CONTENT)) + "%n", DateFormat
                                     .format(mContext.getString(R.string.format_datetime_mdhm),
-                                            callDate)));
+                                            callDate));
                             // Print call attachment location
                             if (!TextUtils.isEmpty(location)) {
-                                ps.println(String.format(getFormat(FORMAT_NOTE_CONTENT),
-                                        location));
+                                ps.printf((getFormat(FORMAT_NOTE_CONTENT)) + "%n",
+                                        location);
                             }
                         } else if (DataConstants.NOTE.equals(mimeType)) {
                             String content = dataCursor.getString(DATA_COLUMN_CONTENT);
                             if (!TextUtils.isEmpty(content)) {
-                                ps.println(String.format(getFormat(FORMAT_NOTE_CONTENT),
-                                        content));
+                                ps.printf((getFormat(FORMAT_NOTE_CONTENT)) + "%n",
+                                        content);
                             }
                         }
                     } while (dataCursor.moveToNext());
@@ -241,14 +241,14 @@ public class BackupUtils {
                 if (folderCursor.moveToFirst()) {
                     do {
                         // Print folder's name
-                        String folderName = "";
+                        String folderName;
                         if(folderCursor.getLong(NOTE_COLUMN_ID) == Notes.ID_CALL_RECORD_FOLDER) {
                             folderName = mContext.getString(R.string.call_record_folder_name);
                         } else {
                             folderName = folderCursor.getString(NOTE_COLUMN_SNIPPET);
                         }
                         if (!TextUtils.isEmpty(folderName)) {
-                            ps.println(String.format(getFormat(FORMAT_FOLDER_NAME), folderName));
+                            ps.printf((getFormat(FORMAT_FOLDER_NAME)) + "%n", folderName);
                         }
                         String folderId = folderCursor.getString(NOTE_COLUMN_ID);
                         exportFolderToText(folderId, ps);
@@ -261,15 +261,15 @@ public class BackupUtils {
             Cursor noteCursor = mContext.getContentResolver().query(
                     Notes.CONTENT_NOTE_URI,
                     NOTE_PROJECTION,
-                    NoteColumns.TYPE + "=" + +Notes.TYPE_NOTE + " AND " + NoteColumns.PARENT_ID
+                    NoteColumns.TYPE + "=" + Notes.TYPE_NOTE + " AND " + NoteColumns.PARENT_ID
                             + "=0", null, null);
 
             if (noteCursor != null) {
                 if (noteCursor.moveToFirst()) {
                     do {
-                        ps.println(String.format(getFormat(FORMAT_NOTE_DATE), DateFormat.format(
+                        ps.printf((getFormat(FORMAT_NOTE_DATE)) + "%n", DateFormat.format(
                                 mContext.getString(R.string.format_datetime_mdhm),
-                                noteCursor.getLong(NOTE_COLUMN_MODIFIED_DATE))));
+                                noteCursor.getLong(NOTE_COLUMN_MODIFIED_DATE)));
                         // Query data belong to this note
                         String noteId = noteCursor.getString(NOTE_COLUMN_ID);
                         exportNoteToText(noteId, ps);
@@ -294,14 +294,11 @@ public class BackupUtils {
             }
             mFileName = file.getName();
             mFileDirectory = mContext.getString(R.string.file_path);
-            PrintStream ps = null;
+            PrintStream ps;
             try {
                 FileOutputStream fos = new FileOutputStream(file);
                 ps = new PrintStream(fos);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                return null;
-            } catch (NullPointerException e) {
+            } catch (FileNotFoundException | NullPointerException e) {
                 e.printStackTrace();
                 return null;
             }
@@ -331,9 +328,7 @@ public class BackupUtils {
                 file.createNewFile();
             }
             return file;
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SecurityException | IOException e) {
             e.printStackTrace();
         }
 

@@ -18,7 +18,6 @@ package net.rdjksp.mi.note.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -35,7 +34,6 @@ import android.preference.PreferenceCategory;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -131,24 +129,22 @@ public class NotesPreferenceActivity extends PreferenceActivity {
         final String defaultAccount = getSyncAccountName(this);
         accountPref.setTitle(getString(R.string.preferences_account_title));
         accountPref.setSummary(getString(R.string.preferences_account_summary));
-        accountPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            public boolean onPreferenceClick(Preference preference) {
-                if (!GTaskSyncService.isSyncing()) {
-                    if (TextUtils.isEmpty(defaultAccount)) {
-                        // the first time to set account
-                        showSelectAccountAlertDialog();
-                    } else {
-                        // if the account has already been set, we need to promp
-                        // user about the risk
-                        showChangeAccountConfirmAlertDialog();
-                    }
+        accountPref.setOnPreferenceClickListener(preference -> {
+            if (!GTaskSyncService.isSyncing()) {
+                if (TextUtils.isEmpty(defaultAccount)) {
+                    // the first time to set account
+                    showSelectAccountAlertDialog();
                 } else {
-                    Toast.makeText(NotesPreferenceActivity.this,
-                            R.string.preferences_toast_cannot_change_account, Toast.LENGTH_SHORT)
-                            .show();
+                    // if the account has already been set, we need to promp
+                    // user about the risk
+                    showChangeAccountConfirmAlertDialog();
                 }
-                return true;
+            } else {
+                Toast.makeText(NotesPreferenceActivity.this,
+                        R.string.preferences_toast_cannot_change_account, Toast.LENGTH_SHORT)
+                        .show();
             }
+            return true;
         });
 
         mAccountCategory.addPreference(accountPref);
@@ -161,18 +157,10 @@ public class NotesPreferenceActivity extends PreferenceActivity {
         // set button state
         if (GTaskSyncService.isSyncing()) {
             syncButton.setText(getString(R.string.preferences_button_sync_cancel));
-            syncButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    GTaskSyncService.cancelSync(NotesPreferenceActivity.this);
-                }
-            });
+            syncButton.setOnClickListener(v -> GTaskSyncService.cancelSync(NotesPreferenceActivity.this));
         } else {
             syncButton.setText(getString(R.string.preferences_button_sync_immediately));
-            syncButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    GTaskSyncService.startSync(NotesPreferenceActivity.this);
-                }
-            });
+            syncButton.setOnClickListener(v -> GTaskSyncService.startSync(NotesPreferenceActivity.this));
         }
         syncButton.setEnabled(!TextUtils.isEmpty(getSyncAccountName(this)));
 
@@ -228,12 +216,10 @@ public class NotesPreferenceActivity extends PreferenceActivity {
                 items[index++] = account.name;
             }
             dialogBuilder.setSingleChoiceItems(items, checkedItem,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            setSyncAccount(itemMapping[which].toString());
-                            dialog.dismiss();
-                            refreshUI();
-                        }
+                    (dialog, which) -> {
+                        setSyncAccount(itemMapping[which].toString());
+                        dialog.dismiss();
+                        refreshUI();
                     });
         }
 
@@ -241,16 +227,14 @@ public class NotesPreferenceActivity extends PreferenceActivity {
         dialogBuilder.setView(addAccountView);
 
         final AlertDialog dialog = dialogBuilder.show();
-        addAccountView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                mHasAddedAccount = true;
-                Intent intent = new Intent("android.settings.ADD_ACCOUNT_SETTINGS");
-                intent.putExtra(AUTHORITIES_FILTER_KEY, new String[] {
-                    "gmail-ls"
-                });
-                startActivityForResult(intent, -1);
-                dialog.dismiss();
-            }
+        addAccountView.setOnClickListener(v -> {
+            mHasAddedAccount = true;
+            Intent intent = new Intent("android.settings.ADD_ACCOUNT_SETTINGS");
+            intent.putExtra(AUTHORITIES_FILTER_KEY, new String[] {
+                "gmail-ls"
+            });
+            startActivityForResult(intent, -1);
+            dialog.dismiss();
         });
     }
 
@@ -270,14 +254,12 @@ public class NotesPreferenceActivity extends PreferenceActivity {
                 getString(R.string.preferences_menu_remove_account),
                 getString(R.string.preferences_menu_cancel)
         };
-        dialogBuilder.setItems(menuItemArray, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    showSelectAccountAlertDialog();
-                } else if (which == 1) {
-                    removeSyncAccount();
-                    refreshUI();
-                }
+        dialogBuilder.setItems(menuItemArray, (dialog, which) -> {
+            if (which == 0) {
+                showSelectAccountAlertDialog();
+            } else if (which == 1) {
+                removeSyncAccount();
+                refreshUI();
             }
         });
         dialogBuilder.show();
@@ -303,13 +285,11 @@ public class NotesPreferenceActivity extends PreferenceActivity {
             setLastSyncTime(this, 0);
 
             // clean up local gtask related info
-            new Thread(new Runnable() {
-                public void run() {
-                    ContentValues values = new ContentValues();
-                    values.put(NoteColumns.GTASK_ID, "");
-                    values.put(NoteColumns.SYNC_ID, 0);
-                    getContentResolver().update(Notes.CONTENT_NOTE_URI, values, null, null);
-                }
+            new Thread(() -> {
+                ContentValues values = new ContentValues();
+                values.put(NoteColumns.GTASK_ID, "");
+                values.put(NoteColumns.SYNC_ID, 0);
+                getContentResolver().update(Notes.CONTENT_NOTE_URI, values, null, null);
             }).start();
 
             Toast.makeText(NotesPreferenceActivity.this,
@@ -330,13 +310,11 @@ public class NotesPreferenceActivity extends PreferenceActivity {
         editor.commit();
 
         // clean up local gtask related info
-        new Thread(new Runnable() {
-            public void run() {
-                ContentValues values = new ContentValues();
-                values.put(NoteColumns.GTASK_ID, "");
-                values.put(NoteColumns.SYNC_ID, 0);
-                getContentResolver().update(Notes.CONTENT_NOTE_URI, values, null, null);
-            }
+        new Thread(() -> {
+            ContentValues values = new ContentValues();
+            values.put(NoteColumns.GTASK_ID, "");
+            values.put(NoteColumns.SYNC_ID, 0);
+            getContentResolver().update(Notes.CONTENT_NOTE_URI, values, null, null);
         }).start();
     }
 

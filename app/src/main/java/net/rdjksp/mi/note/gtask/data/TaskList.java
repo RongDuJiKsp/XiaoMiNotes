@@ -35,11 +35,11 @@ public class TaskList extends Node {
 
     private int mIndex;
 
-    private ArrayList<Task> mChildren;
+    private final ArrayList<Task> mChildren;
 
     public TaskList() {
         super();
-        mChildren = new ArrayList<Task>();
+        mChildren = new ArrayList<>();
         mIndex = 1;
     }
 

@@ -25,6 +25,7 @@ import net.rdjksp.mi.note.tool.ResourceParser;
 
 /**
  * 该组件重写了一些方法将组件尺寸改为了4x
+ * @author YuQi_Zhou
  */
 public class NoteWidgetProvider_4x extends NoteWidgetProvider {
     @Override

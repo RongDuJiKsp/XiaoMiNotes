@@ -93,7 +93,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
 
     private enum ListEditState {
         NOTE_LIST, SUB_FOLDER, CALL_RECORD_FOLDER
-    };
+    }
 
     private ListEditState mState;
 
@@ -141,8 +141,8 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         setContentView(R.layout.note_list);
         initResources();
 
-        /**
-         * Insert an introduction when user firstly use this application
+        /*
+          Insert an introduction when user firstly use this application
          */
         setAppInfoFromRawRes();
     }
@@ -258,13 +258,10 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             mDropDownMenu = new DropdownMenu(NotesListActivity.this,
                     (Button) customView.findViewById(R.id.selection_menu),
                     R.menu.note_list_dropdown);
-            mDropDownMenu.setOnDropdownMenuItemClickListener(new PopupMenu.OnMenuItemClickListener(){
-                public boolean onMenuItemClick(MenuItem item) {
-                    mNotesListAdapter.selectAll(!mNotesListAdapter.isAllSelected());
-                    updateMenu();
-                    return true;
-                }
-
+            mDropDownMenu.setOnDropdownMenuItemClickListener(item -> {
+                mNotesListAdapter.selectAll(!mNotesListAdapter.isAllSelected());
+                updateMenu();
+                return true;
             });
             return true;
         }
@@ -327,12 +324,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                     builder.setMessage(getString(R.string.alert_message_delete_notes,
                                              mNotesListAdapter.getSelectedCount()));
                     builder.setPositiveButton(android.R.string.ok,
-                                             new DialogInterface.OnClickListener() {
-                                                 public void onClick(DialogInterface dialog,
-                                                         int which) {
-                                                     batchDelete();
-                                                 }
-                                             });
+                            (dialog, which) -> batchDelete());
                     builder.setNegativeButton(android.R.string.cancel, null);
                     builder.show();
                     break;
@@ -356,21 +348,21 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                     int newNoteViewHeight = mAddNewNote.getHeight();
                     int start = screenHeight - newNoteViewHeight;
                     int eventY = start + (int) event.getY();
-                    /**
-                     * Minus TitleBar's height
+                    /*
+                      Minus TitleBar's height
                      */
                     if (mState == ListEditState.SUB_FOLDER) {
                         eventY -= mTitleBar.getHeight();
                         start -= mTitleBar.getHeight();
                     }
-                    /**
-                     * HACKME:When click the transparent part of "New Note" button, dispatch
-                     * the event to the list view behind this button. The transparent part of
-                     * "New Note" button could be expressed by formula y=-0.12x+94（Unit:pixel）
-                     * and the line top of the button. The coordinate based on left of the "New
-                     * Note" button. The 94 represents maximum height of the transparent part.
-                     * Notice that, if the background of the button changes, the formula should
-                     * also change. This is very bad, just for the UI designer's strong requirement.
+                    /*
+                      HACKME:When click the transparent part of "New Note" button, dispatch
+                      the event to the list view behind this button. The transparent part of
+                      "New Note" button could be expressed by formula y=-0.12x+94（Unit:pixel）
+                      and the line top of the button. The coordinate based on left of the "New
+                      Note" button. The 94 represents maximum height of the transparent part.
+                      Notice that, if the background of the button changes, the formula should
+                      also change. This is very bad, just for the UI designer's strong requirement.
                      */
                     if (event.getY() < (event.getX() * (-0.12) + 94)) {
                         View view = mNotesListView.getChildAt(mNotesListView.getChildCount() - 1
@@ -406,7 +398,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             return false;
         }
 
-    };
+    }
 
     private void startAsyncNotesListQuery() {
         String selection = (mCurrentFolderId == Notes.ID_ROOT_FOLDER) ? ROOT_FOLDER_SELECTION
@@ -445,19 +437,16 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         AlertDialog.Builder builder = new AlertDialog.Builder(NotesListActivity.this);
         builder.setTitle(R.string.menu_title_select_folder);
         final FoldersListAdapter adapter = new FoldersListAdapter(this, cursor);
-        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int which) {
-                DataUtils.batchMoveToFolder(mContentResolver,
-                        mNotesListAdapter.getSelectedItemIds(), adapter.getItemId(which));
-                Toast.makeText(
-                        NotesListActivity.this,
-                        getString(R.string.format_move_notes_to_folder,
-                                mNotesListAdapter.getSelectedCount(),
-                                adapter.getFolderName(NotesListActivity.this, which)),
-                        Toast.LENGTH_SHORT).show();
-                mModeCallBack.finishActionMode();
-            }
+        builder.setAdapter(adapter, (dialog, which) -> {
+            DataUtils.batchMoveToFolder(mContentResolver,
+                    mNotesListAdapter.getSelectedItemIds(), adapter.getItemId(which));
+            Toast.makeText(
+                    NotesListActivity.this,
+                    getString(R.string.format_move_notes_to_folder,
+                            mNotesListAdapter.getSelectedCount(),
+                            adapter.getFolderName(NotesListActivity.this, which)),
+                    Toast.LENGTH_SHORT).show();
+            mModeCallBack.finishActionMode();
         });
         builder.show();
     }
@@ -512,7 +501,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             return;
         }
 
-        HashSet<Long> ids = new HashSet<Long>();
+        HashSet<Long> ids = new HashSet<>();
         ids.add(folderId);
         HashSet<AppWidgetAttribute> widgets = DataUtils.getFolderNoteWidget(mContentResolver,
                 folderId);
@@ -598,50 +587,44 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         }
 
         builder.setPositiveButton(android.R.string.ok, null);
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                hideSoftInput(etName);
-            }
-        });
+        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> hideSoftInput(etName));
 
         final Dialog dialog = builder.setView(view).show();
         final Button positive = (Button)dialog.findViewById(android.R.id.button1);
-        positive.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                hideSoftInput(etName);
-                String name = etName.getText().toString();
-                if (DataUtils.checkVisibleFolderName(mContentResolver, name)) {
-                    Toast.makeText(NotesListActivity.this, getString(R.string.folder_exist, name),
-                            Toast.LENGTH_LONG).show();
-                    etName.setSelection(0, etName.length());
-                    return;
-                }
-                if (!create) {
-                    if (!TextUtils.isEmpty(name)) {
-                        ContentValues values = new ContentValues();
-                        values.put(NoteColumns.SNIPPET, name);
-                        values.put(NoteColumns.TYPE, Notes.TYPE_FOLDER);
-                        values.put(NoteColumns.LOCAL_MODIFIED, 1);
-                        mContentResolver.update(Notes.CONTENT_NOTE_URI, values, NoteColumns.ID
-                                + "=?", new String[] {
-                            String.valueOf(mFocusNoteDataItem.getId())
-                        });
-                    }
-                } else if (!TextUtils.isEmpty(name)) {
+        positive.setOnClickListener(v -> {
+            hideSoftInput(etName);
+            String name = etName.getText().toString();
+            if (DataUtils.checkVisibleFolderName(mContentResolver, name)) {
+                Toast.makeText(NotesListActivity.this, getString(R.string.folder_exist, name),
+                        Toast.LENGTH_LONG).show();
+                etName.setSelection(0, etName.length());
+                return;
+            }
+            if (!create) {
+                if (!TextUtils.isEmpty(name)) {
                     ContentValues values = new ContentValues();
                     values.put(NoteColumns.SNIPPET, name);
                     values.put(NoteColumns.TYPE, Notes.TYPE_FOLDER);
-                    mContentResolver.insert(Notes.CONTENT_NOTE_URI, values);
+                    values.put(NoteColumns.LOCAL_MODIFIED, 1);
+                    mContentResolver.update(Notes.CONTENT_NOTE_URI, values, NoteColumns.ID
+                            + "=?", new String[] {
+                        String.valueOf(mFocusNoteDataItem.getId())
+                    });
                 }
-                dialog.dismiss();
+            } else if (!TextUtils.isEmpty(name)) {
+                ContentValues values = new ContentValues();
+                values.put(NoteColumns.SNIPPET, name);
+                values.put(NoteColumns.TYPE, Notes.TYPE_FOLDER);
+                mContentResolver.insert(Notes.CONTENT_NOTE_URI, values);
             }
+            dialog.dismiss();
         });
 
         if (TextUtils.isEmpty(etName.getText())) {
             positive.setEnabled(false);
         }
-        /**
-         * When the name edit text is null, disable the positive button
+        /*
+          When the name edit text is null, disable the positive button
          */
         etName.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -650,11 +633,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (TextUtils.isEmpty(etName.getText())) {
-                    positive.setEnabled(false);
-                } else {
-                    positive.setEnabled(true);
-                }
+                positive.setEnabled(!TextUtils.isEmpty(etName.getText()));
             }
 
             public void afterTextChanged(Editable s) {
@@ -742,11 +721,7 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
                 builder.setIcon(android.R.drawable.ic_dialog_alert);
                 builder.setMessage(getString(R.string.alert_message_delete_folder));
                 builder.setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                deleteFolder(mFocusNoteDataItem.getId());
-                            }
-                        });
+                        (dialog, which) -> deleteFolder(mFocusNoteDataItem.getId()));
                 builder.setNegativeButton(android.R.string.cancel, null);
                 builder.show();
                 break;

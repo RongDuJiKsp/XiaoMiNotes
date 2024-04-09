@@ -163,10 +163,10 @@ public class ResourceParser {
         };
 
         public static int getTexAppearanceResource(int id) {
-            /**
-             * HACKME: Fix bug of store the resource id in shared preference.
-             * The id may larger than the length of resources, in this case,
-             * return the {@link ResourceParser#BG_DEFAULT_FONT_SIZE}
+            /*
+              HACKME: Fix bug of store the resource id in shared preference.
+              The id may larger than the length of resources, in this case,
+              return the {@link ResourceParser#BG_DEFAULT_FONT_SIZE}
              */
             if (id >= TEXTAPPEARANCE_RESOURCES.length) {
                 return BG_DEFAULT_FONT_SIZE;

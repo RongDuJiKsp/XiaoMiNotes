@@ -47,7 +47,7 @@ public class DataUtils {
             return true;
         }
 
-        ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
+        ArrayList<ContentProviderOperation> operationList = new ArrayList<>();
         for (long id : ids) {
             if(id == Notes.ID_ROOT_FOLDER) {
                 Log.e(TAG, "Don't delete system folder root");
@@ -60,14 +60,12 @@ public class DataUtils {
         try {
             ContentProviderResult[] results = resolver.applyBatch(Notes.AUTHORITY, operationList);
             if (results == null || results.length == 0 || results[0] == null) {
-                Log.d(TAG, "delete notes failed, ids:" + ids.toString());
+                Log.d(TAG, "delete notes failed, ids:" + ids);
                 return false;
             }
             return true;
-        } catch (RemoteException e) {
-            Log.e(TAG, String.format("%s: %s", e.toString(), e.getMessage()));
-        } catch (OperationApplicationException e) {
-            Log.e(TAG, String.format("%s: %s", e.toString(), e.getMessage()));
+        } catch (RemoteException | OperationApplicationException e) {
+            Log.e(TAG, String.format("%s: %s", e, e.getMessage()));
         }
         return false;
     }
@@ -87,7 +85,7 @@ public class DataUtils {
             return true;
         }
 
-        ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
+        ArrayList<ContentProviderOperation> operationList = new ArrayList<>();
         for (long id : ids) {
             ContentProviderOperation.Builder builder = ContentProviderOperation
                     .newUpdate(ContentUris.withAppendedId(Notes.CONTENT_NOTE_URI, id));
@@ -99,14 +97,12 @@ public class DataUtils {
         try {
             ContentProviderResult[] results = resolver.applyBatch(Notes.AUTHORITY, operationList);
             if (results == null || results.length == 0 || results[0] == null) {
-                Log.d(TAG, "delete notes failed, ids:" + ids.toString());
+                Log.d(TAG, "delete notes failed, ids:" + ids);
                 return false;
             }
             return true;
-        } catch (RemoteException e) {
-            Log.e(TAG, String.format("%s: %s", e.toString(), e.getMessage()));
-        } catch (OperationApplicationException e) {
-            Log.e(TAG, String.format("%s: %s", e.toString(), e.getMessage()));
+        } catch (RemoteException | OperationApplicationException e) {
+            Log.e(TAG, String.format("%s: %s", e, e.getMessage()));
         }
         return false;
     }
@@ -127,7 +123,7 @@ public class DataUtils {
                 try {
                     count = cursor.getInt(0);
                 } catch (IndexOutOfBoundsException e) {
-                    Log.e(TAG, "get folder count failed:" + e.toString());
+                    Log.e(TAG, "get folder count failed:" + e);
                 } finally {
                     cursor.close();
                 }
@@ -207,7 +203,7 @@ public class DataUtils {
         HashSet<AppWidgetAttribute> set = null;
         if (c != null) {
             if (c.moveToFirst()) {
-                set = new HashSet<AppWidgetAttribute>();
+                set = new HashSet<>();
                 do {
                     try {
                         AppWidgetAttribute widget = new AppWidgetAttribute();
@@ -235,7 +231,7 @@ public class DataUtils {
             try {
                 return cursor.getString(0);
             } catch (IndexOutOfBoundsException e) {
-                Log.e(TAG, "Get call number fails " + e.toString());
+                Log.e(TAG, "Get call number fails " + e);
             } finally {
                 cursor.close();
             }
@@ -256,7 +252,7 @@ public class DataUtils {
                 try {
                     return cursor.getLong(0);
                 } catch (IndexOutOfBoundsException e) {
-                    Log.e(TAG, "Get call note id fails " + e.toString());
+                    Log.e(TAG, "Get call note id fails " + e);
                 }
             }
             cursor.close();

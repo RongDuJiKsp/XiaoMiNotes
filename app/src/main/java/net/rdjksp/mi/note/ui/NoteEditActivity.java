@@ -84,7 +84,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         public ImageView ibSetBgColor;
     }
 
-    private static final Map<Integer, Integer> sBgSelectorBtnsMap = new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> sBgSelectorBtnsMap = new HashMap<>();
     static {
         sBgSelectorBtnsMap.put(R.id.iv_bg_yellow, ResourceParser.YELLOW);
         sBgSelectorBtnsMap.put(R.id.iv_bg_red, ResourceParser.RED);
@@ -93,7 +93,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         sBgSelectorBtnsMap.put(R.id.iv_bg_white, ResourceParser.WHITE);
     }
 
-    private static final Map<Integer, Integer> sBgSelectorSelectionMap = new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> sBgSelectorSelectionMap = new HashMap<>();
     static {
         sBgSelectorSelectionMap.put(ResourceParser.YELLOW, R.id.iv_bg_yellow_select);
         sBgSelectorSelectionMap.put(ResourceParser.RED, R.id.iv_bg_red_select);
@@ -102,7 +102,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         sBgSelectorSelectionMap.put(ResourceParser.WHITE, R.id.iv_bg_white_select);
     }
 
-    private static final Map<Integer, Integer> sFontSizeBtnsMap = new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> sFontSizeBtnsMap = new HashMap<>();
     static {
         sFontSizeBtnsMap.put(R.id.ll_font_large, ResourceParser.TEXT_LARGE);
         sFontSizeBtnsMap.put(R.id.ll_font_small, ResourceParser.TEXT_SMALL);
@@ -110,7 +110,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         sFontSizeBtnsMap.put(R.id.ll_font_super, ResourceParser.TEXT_SUPER);
     }
 
-    private static final Map<Integer, Integer> sFontSelectorSelectionMap = new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> sFontSelectorSelectionMap = new HashMap<>();
     static {
         sFontSelectorSelectionMap.put(ResourceParser.TEXT_LARGE, R.id.iv_large_select);
         sFontSelectorSelectionMap.put(ResourceParser.TEXT_SMALL, R.id.iv_small_select);
@@ -180,17 +180,17 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     }
 
     private boolean initActivityState(Intent intent) {
-        /**
-         * If the user specified the {@link Intent#ACTION_VIEW} but not provided with id,
-         * then jump to the NotesListActivity
+        /*
+          If the user specified the {@link Intent#ACTION_VIEW} but not provided with id,
+          then jump to the NotesListActivity
          */
         mWorkingNote = null;
         if (TextUtils.equals(Intent.ACTION_VIEW, intent.getAction())) {
             long noteId = intent.getLongExtra(Intent.EXTRA_UID, 0);
             mUserQuery = "";
 
-            /**
-             * Starting from the searched result
+            /*
+              Starting from the searched result
              */
             if (intent.hasExtra(SearchManager.EXTRA_DATA_KEY)) {
                 noteId = Long.parseLong(intent.getStringExtra(SearchManager.EXTRA_DATA_KEY));
@@ -288,9 +288,9 @@ public class NoteEditActivity extends Activity implements OnClickListener,
                         | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_TIME
                         | DateUtils.FORMAT_SHOW_YEAR));
 
-        /**
-         * TODO: Add the menu for setting alert. Currently disable it because the DateTimePicker
-         * is not ready
+        /*
+          TODO: Add the menu for setting alert. Currently disable it because the DateTimePicker
+          is not ready
          */
         showAlertHeader();
     }
@@ -309,7 +309,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         } else {
             mNoteHeaderHolder.tvAlertDate.setVisibility(View.GONE);
             mNoteHeaderHolder.ivAlertIcon.setVisibility(View.GONE);
-        };
+        }
     }
 
     @Override
@@ -321,10 +321,10 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        /**
-         * For new note without note id, we should firstly save it to
-         * generate a id. If the editing note is not worth saving, there
-         * is no id which is equivalent to create new note
+        /*
+          For new note without note id, we should firstly save it to
+          generate a id. If the editing note is not worth saving, there
+          is no id which is equivalent to create new note
          */
         if (!mWorkingNote.existInDatabase()) {
             saveNote();
@@ -354,13 +354,10 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         view.getLocationOnScreen(location);
         int x = location[0];
         int y = location[1];
-        if (ev.getX() < x
-                || ev.getX() > (x + view.getWidth())
-                || ev.getY() < y
-                || ev.getY() > (y + view.getHeight())) {
-                    return false;
-                }
-        return true;
+        return !(ev.getX() < x)
+                && !(ev.getX() > (x + view.getWidth()))
+                && !(ev.getY() < y)
+                && !(ev.getY() > (y + view.getHeight()));
     }
 
     private void initResources() {
@@ -383,13 +380,13 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         for (int id : sFontSizeBtnsMap.keySet()) {
             View view = findViewById(id);
             view.setOnClickListener(this);
-        };
+        }
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mFontSizeId = mSharedPrefs.getInt(PREFERENCE_FONT_SIZE, ResourceParser.BG_DEFAULT_FONT_SIZE);
-        /**
-         * HACKME: Fix bug of store the resource id in shared preference.
-         * The id may larger than the length of resources, in this case,
-         * return the {@link ResourceParser#BG_DEFAULT_FONT_SIZE}
+        /*
+          HACKME: Fix bug of store the resource id in shared preference.
+          The id may larger than the length of resources, in this case,
+          return the {@link ResourceParser#BG_DEFAULT_FONT_SIZE}
          */
         if(mFontSizeId >= TextAppearanceResources.getResourcesSize()) {
             mFontSizeId = ResourceParser.BG_DEFAULT_FONT_SIZE;
@@ -517,11 +514,9 @@ public class NoteEditActivity extends Activity implements OnClickListener,
                 builder.setIcon(android.R.drawable.ic_dialog_alert);
                 builder.setMessage(getString(R.string.alert_message_delete_note));
                 builder.setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                deleteCurrentNote();
-                                finish();
-                            }
+                        (dialog, which) -> {
+                            deleteCurrentNote();
+                            finish();
                         });
                 builder.setNegativeButton(android.R.string.cancel, null);
                 builder.show();
@@ -555,11 +550,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
 
     private void setReminder() {
         DateTimePickerDialog d = new DateTimePickerDialog(this, System.currentTimeMillis());
-        d.setOnDateTimeSetListener(new OnDateTimeSetListener() {
-            public void OnDateTimeSet(AlertDialog dialog, long date) {
-                mWorkingNote.setAlertDate(date	, true);
-            }
-        });
+        d.setOnDateTimeSetListener((dialog, date) -> mWorkingNote.setAlertDate(date	, true));
         d.show();
     }
 
@@ -588,7 +579,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
 
     private void deleteCurrentNote() {
         if (mWorkingNote.existInDatabase()) {
-            HashSet<Long> ids = new HashSet<Long>();
+            HashSet<Long> ids = new HashSet<>();
             long id = mWorkingNote.getNoteId();
             if (id != Notes.ID_ROOT_FOLDER) {
                 ids.add(id);
@@ -613,9 +604,9 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     }
 
     public void onClockAlertChanged(long date, boolean set) {
-        /**
-         * User could set clock to an unsaved note, so before setting the
-         * alert clock, we should save the note first
+        /*
+          User could set clock to an unsaved note, so before setting the
+          alert clock, we should save the note first
          */
         if (!mWorkingNote.existInDatabase()) {
             saveNote();
@@ -632,10 +623,10 @@ public class NoteEditActivity extends Activity implements OnClickListener,
                 alarmManager.set(AlarmManager.RTC_WAKEUP, date, pendingIntent);
             }
         } else {
-            /**
-             * There is the condition that user has input nothing (the note is
-             * not worthy saving), we have no note id, remind the user that he
-             * should input something
+            /*
+              There is the condition that user has input nothing (the note is
+              not worthy saving), we have no note id, remind the user that he
+              should input something
              */
             Log.e(TAG, "Clock alert setting error");
             showToast(R.string.error_note_empty_for_clock);
@@ -673,8 +664,8 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     }
 
     public void onEditTextEnter(int index, String text) {
-        /**
-         * Should not happen, check for debug
+        /*
+          Should not happen, check for debug
          */
         if(index > mEditTextList.getChildCount()) {
             Log.e(TAG, "Index out of mEditTextList boundrary, should not happen");
@@ -730,13 +721,11 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         final NoteEditText edit = (NoteEditText) view.findViewById(R.id.et_edit_text);
         edit.setTextAppearance(this, TextAppearanceResources.getTexAppearanceResource(mFontSizeId));
         CheckBox cb = ((CheckBox) view.findViewById(R.id.cb_edit_item));
-        cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    edit.setPaintFlags(edit.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                } else {
-                    edit.setPaintFlags(Paint.ANTI_ALIAS_FLAG | Paint.DEV_KERN_TEXT_FLAG);
-                }
+        cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                edit.setPaintFlags(edit.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                edit.setPaintFlags(Paint.ANTI_ALIAS_FLAG | Paint.DEV_KERN_TEXT_FLAG);
             }
         });
 
@@ -809,12 +798,12 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         getWorkingText();
         boolean saved = mWorkingNote.saveNote();
         if (saved) {
-            /**
-             * There are two modes from List view to edit view, open one note,
-             * create/edit a node. Opening node requires to the original
-             * position in the list when back from edit view, while creating a
-             * new node requires to the top of the list. This code
-             * {@link #RESULT_OK} is used to identify the create/edit state
+            /*
+              There are two modes from List view to edit view, open one note,
+              create/edit a node. Opening node requires to the original
+              position in the list when back from edit view, while creating a
+              new node requires to the top of the list. This code
+              {@link #RESULT_OK} is used to identify the create/edit state
              */
             setResult(RESULT_OK);
         }
@@ -822,10 +811,10 @@ public class NoteEditActivity extends Activity implements OnClickListener,
     }
 
     private void sendToDesktop() {
-        /**
-         * Before send message to home, we should make sure that current
-         * editing note is exists in databases. So, for new note, firstly
-         * save it
+        /*
+          Before send message to home, we should make sure that current
+          editing note is exists in databases. So, for new note, firstly
+          save it
          */
         if (!mWorkingNote.existInDatabase()) {
             saveNote();
@@ -846,10 +835,10 @@ public class NoteEditActivity extends Activity implements OnClickListener,
             showToast(R.string.info_note_enter_desktop);
             sendBroadcast(sender);
         } else {
-            /**
-             * There is the condition that user has input nothing (the note is
-             * not worthy saving), we have no note id, remind the user that he
-             * should input something
+            /*
+              There is the condition that user has input nothing (the note is
+              not worthy saving), we have no note id, remind the user that he
+              should input something
              */
             Log.e(TAG, "Send to desktop error");
             showToast(R.string.error_note_empty_for_send_to_desktop);

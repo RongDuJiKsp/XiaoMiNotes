@@ -64,7 +64,7 @@ public class FoldersListAdapter extends CursorAdapter {
     }
 
     private class FolderListItem extends LinearLayout {
-        private TextView mName;
+        private final TextView mName;
 
         public FolderListItem(Context context) {
             super(context);

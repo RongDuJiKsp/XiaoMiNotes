@@ -46,7 +46,7 @@ public class NoteEditText extends EditText {
     private static final String SCHEME_HTTP = "http:" ;
     private static final String SCHEME_EMAIL = "mailto:" ;
 
-    private static final Map<String, Integer> sSchemaActionResMap = new HashMap<String, Integer>();
+    private static final Map<String, Integer> sSchemaActionResMap = new HashMap<>();
     static {
         sSchemaActionResMap.put(SCHEME_TEL, R.string.note_link_tel);
         sSchemaActionResMap.put(SCHEME_HTTP, R.string.note_link_web);
@@ -170,11 +170,7 @@ public class NoteEditText extends EditText {
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         if (mOnTextViewChangeListener != null) {
-            if (!focused && TextUtils.isEmpty(getText())) {
-                mOnTextViewChangeListener.onTextChange(mIndex, false);
-            } else {
-                mOnTextViewChangeListener.onTextChange(mIndex, true);
-            }
+            mOnTextViewChangeListener.onTextChange(mIndex, focused || !TextUtils.isEmpty(getText()));
         }
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
     }
@@ -192,7 +188,7 @@ public class NoteEditText extends EditText {
             if (urls.length == 1) {
                 int defaultResId = 0;
                 for(String schema: sSchemaActionResMap.keySet()) {
-                    if(urls[0].getURL().indexOf(schema) >= 0) {
+                    if(urls[0].getURL().contains(schema)) {
                         defaultResId = sSchemaActionResMap.get(schema);
                         break;
                     }
@@ -203,12 +199,10 @@ public class NoteEditText extends EditText {
                 }
 
                 menu.add(0, 0, 0, defaultResId).setOnMenuItemClickListener(
-                        new OnMenuItemClickListener() {
-                            public boolean onMenuItemClick(MenuItem item) {
-                                // goto a new intent
-                                urls[0].onClick(NoteEditText.this);
-                                return true;
-                            }
+                        item -> {
+                            // goto a new intent
+                            urls[0].onClick(NoteEditText.this);
+                            return true;
                         });
             }
         }

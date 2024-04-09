@@ -34,7 +34,7 @@ import net.rdjksp.mi.note.tool.ResourceParser.NoteBgResources;
 
 public class WorkingNote {
     // Note for the working note
-    private Note mNote;
+    private final Note mNote;
     // Note Id
     private long mNoteId;
     // Note content
@@ -54,7 +54,7 @@ public class WorkingNote {
 
     private long mFolderId;
 
-    private Context mContext;
+    private final Context mContext;
 
     private static final String TAG = "WorkingNote";
 
@@ -198,8 +198,8 @@ public class WorkingNote {
 
             mNote.syncNote(mContext, mNoteId);
 
-            /**
-             * Update widget content if there exist any widget of this note
+            /*
+              Update widget content if there exist any widget of this note
              */
             if (mWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID
                     && mWidgetType != Notes.TYPE_WIDGET_INVALIDE
@@ -217,12 +217,8 @@ public class WorkingNote {
     }
 
     private boolean isWorthSaving() {
-        if (mIsDeleted || (!existInDatabase() && TextUtils.isEmpty(mContent))
-                || (existInDatabase() && !mNote.isLocalModified())) {
-            return false;
-        } else {
-            return true;
-        }
+        return !mIsDeleted && (existInDatabase() || !TextUtils.isEmpty(mContent))
+                && (!existInDatabase() || mNote.isLocalModified());
     }
 
     public void setOnSettingStatusChangedListener(NoteSettingChangedListener l) {
@@ -295,7 +291,7 @@ public class WorkingNote {
     }
 
     public boolean hasClockAlert() {
-        return (mAlertDate > 0 ? true : false);
+        return (mAlertDate > 0);
     }
 
     public String getContent() {
