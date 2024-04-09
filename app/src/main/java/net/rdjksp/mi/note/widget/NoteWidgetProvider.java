@@ -32,6 +32,9 @@ import net.rdjksp.mi.note.tool.ResourceParser;
 import net.rdjksp.mi.note.ui.NoteEditActivity;
 import net.rdjksp.mi.note.ui.NotesListActivity;
 
+/**
+ * widget是安卓桌面小组件 该抽象类提供了基本的小组件功能方法
+ */
 public abstract class NoteWidgetProvider extends AppWidgetProvider {
     public static final String [] PROJECTION = new String [] {
         NoteColumns.ID,
@@ -45,15 +48,18 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = "NoteWidgetProvider";
 
+    /**
+     * 重载销毁组件时调用的生命周期钩子
+     */
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         ContentValues values = new ContentValues();
         values.put(NoteColumns.WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        for (int i = 0; i < appWidgetIds.length; i++) {
+        for (int appWidgetId : appWidgetIds) {
             context.getContentResolver().update(Notes.CONTENT_NOTE_URI,
                     values,
                     NoteColumns.WIDGET_ID + "=?",
-                    new String[] { String.valueOf(appWidgetIds[i])});
+                    new String[]{String.valueOf(appWidgetId)});
         }
     }
 
@@ -71,19 +77,22 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
 
     private void update(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds,
             boolean privacyMode) {
-        for (int i = 0; i < appWidgetIds.length; i++) {
-            if (appWidgetIds[i] != AppWidgetManager.INVALID_APPWIDGET_ID) {
+        /*
+          Generate the pending intent to start host for the widget
+         */
+        for (int appWidgetId : appWidgetIds) {
+            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                 int bgId = ResourceParser.getDefaultBgId(context);
-                String snippet = "";
+                String snippet;
                 Intent intent = new Intent(context, NoteEditActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                intent.putExtra(Notes.INTENT_EXTRA_WIDGET_ID, appWidgetIds[i]);
+                intent.putExtra(Notes.INTENT_EXTRA_WIDGET_ID, appWidgetId);
                 intent.putExtra(Notes.INTENT_EXTRA_WIDGET_TYPE, getWidgetType());
 
-                Cursor c = getNoteWidgetInfo(context, appWidgetIds[i]);
+                Cursor c = getNoteWidgetInfo(context, appWidgetId);
                 if (c != null && c.moveToFirst()) {
                     if (c.getCount() > 1) {
-                        Log.e(TAG, "Multiple message with same widget id:" + appWidgetIds[i]);
+                        Log.e(TAG, "Multiple message with same widget id:" + appWidgetId);
                         c.close();
                         return;
                     }
@@ -103,23 +112,23 @@ public abstract class NoteWidgetProvider extends AppWidgetProvider {
                 RemoteViews rv = new RemoteViews(context.getPackageName(), getLayoutId());
                 rv.setImageViewResource(R.id.widget_bg_image, getBgResourceId(bgId));
                 intent.putExtra(Notes.INTENT_EXTRA_BACKGROUND_ID, bgId);
-                /**
-                 * Generate the pending intent to start host for the widget
+                /*
+                  Generate the pending intent to start host for the widget
                  */
-                PendingIntent pendingIntent = null;
+                PendingIntent pendingIntent ;
                 if (privacyMode) {
                     rv.setTextViewText(R.id.widget_text,
                             context.getString(R.string.widget_under_visit_mode));
-                    pendingIntent = PendingIntent.getActivity(context, appWidgetIds[i], new Intent(
+                    pendingIntent = PendingIntent.getActivity(context, appWidgetId, new Intent(
                             context, NotesListActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
                 } else {
                     rv.setTextViewText(R.id.widget_text, snippet);
-                    pendingIntent = PendingIntent.getActivity(context, appWidgetIds[i], intent,
+                    pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent,
                             PendingIntent.FLAG_UPDATE_CURRENT);
                 }
 
                 rv.setOnClickPendingIntent(R.id.widget_text, pendingIntent);
-                appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
+                appWidgetManager.updateAppWidget(appWidgetId, rv);
             }
         }
     }
