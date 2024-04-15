@@ -23,7 +23,10 @@ import net.rdjksp.mi.note.R;
 import net.rdjksp.mi.note.data.Notes;
 import net.rdjksp.mi.note.tool.ResourceParser;
 
-
+/**
+ * 该组件重写了一些方法将组件尺寸改为了2x
+ * @author YuQi_Zhou
+ */
 public class NoteWidgetProvider_2x extends NoteWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {

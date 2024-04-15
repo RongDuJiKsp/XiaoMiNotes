@@ -238,31 +238,31 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
     private void createSystemFolder(SQLiteDatabase db) {
         ContentValues values = new ContentValues();
 
-        /**
-         * call record foler for call notes
+        /*
+          call record foler for call notes
          */
         values.put(NoteColumns.ID, Notes.ID_CALL_RECORD_FOLDER);
         values.put(NoteColumns.TYPE, Notes.TYPE_SYSTEM);
         db.insert(TABLE.NOTE, null, values);
 
-        /**
-         * root folder which is default folder
+        /*
+          root folder which is default folder
          */
         values.clear();
         values.put(NoteColumns.ID, Notes.ID_ROOT_FOLDER);
         values.put(NoteColumns.TYPE, Notes.TYPE_SYSTEM);
         db.insert(TABLE.NOTE, null, values);
 
-        /**
-         * temporary folder which is used for moving note
+        /*
+          temporary folder which is used for moving note
          */
         values.clear();
         values.put(NoteColumns.ID, Notes.ID_TEMPARAY_FOLDER);
         values.put(NoteColumns.TYPE, Notes.TYPE_SYSTEM);
         db.insert(TABLE.NOTE, null, values);
 
-        /**
-         * create trash folder
+        /*
+          create trash folder
          */
         values.clear();
         values.put(NoteColumns.ID, Notes.ID_TRASH_FOLER);

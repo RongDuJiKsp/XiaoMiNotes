@@ -50,9 +50,9 @@ public class DateTimePicker extends FrameLayout {
     private final NumberPicker mHourSpinner;
     private final NumberPicker mMinuteSpinner;
     private final NumberPicker mAmPmSpinner;
-    private Calendar mDate;
+    private final Calendar mDate;
 
-    private String[] mDateDisplayValues = new String[DAYS_IN_ALL_WEEK];
+    private final String[] mDateDisplayValues = new String[DAYS_IN_ALL_WEEK];
 
     private boolean mIsAm;
 
@@ -64,7 +64,7 @@ public class DateTimePicker extends FrameLayout {
 
     private OnDateTimeChangedListener mOnDateTimeChangedListener;
 
-    private NumberPicker.OnValueChangeListener mOnDateChangedListener = new NumberPicker.OnValueChangeListener() {
+    private final NumberPicker.OnValueChangeListener mOnDateChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mDate.add(Calendar.DAY_OF_YEAR, newVal - oldVal);
@@ -73,7 +73,7 @@ public class DateTimePicker extends FrameLayout {
         }
     };
 
-    private NumberPicker.OnValueChangeListener mOnHourChangedListener = new NumberPicker.OnValueChangeListener() {
+    private final NumberPicker.OnValueChangeListener mOnHourChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             boolean isDateChanged = false;
@@ -115,7 +115,7 @@ public class DateTimePicker extends FrameLayout {
         }
     };
 
-    private NumberPicker.OnValueChangeListener mOnMinuteChangedListener = new NumberPicker.OnValueChangeListener() {
+    private final NumberPicker.OnValueChangeListener mOnMinuteChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             int minValue = mMinuteSpinner.getMinValue();
@@ -144,7 +144,7 @@ public class DateTimePicker extends FrameLayout {
         }
     };
 
-    private NumberPicker.OnValueChangeListener mOnAmPmChangedListener = new NumberPicker.OnValueChangeListener() {
+    private final NumberPicker.OnValueChangeListener mOnAmPmChangedListener = new NumberPicker.OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mIsAm = !mIsAm;

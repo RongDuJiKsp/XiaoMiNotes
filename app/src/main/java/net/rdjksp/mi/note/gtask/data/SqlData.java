@@ -64,7 +64,7 @@ public class SqlData {
 
     public static final int DATA_CONTENT_DATA_3_COLUMN = 4;
 
-    private ContentResolver mContentResolver;
+    private final ContentResolver mContentResolver;
 
     private boolean mIsCreate;
 
@@ -78,7 +78,7 @@ public class SqlData {
 
     private String mDataContentData3;
 
-    private ContentValues mDiffDataValues;
+    private final ContentValues mDiffDataValues;
 
     public SqlData(Context context) {
         mContentResolver = context.getContentResolver();
@@ -163,9 +163,9 @@ public class SqlData {
             mDiffDataValues.put(DataColumns.NOTE_ID, noteId);
             Uri uri = mContentResolver.insert(Notes.CONTENT_DATA_URI, mDiffDataValues);
             try {
-                mDataId = Long.valueOf(uri.getPathSegments().get(1));
+                mDataId = Long.parseLong(uri.getPathSegments().get(1));
             } catch (NumberFormatException e) {
-                Log.e(TAG, "Get note id error :" + e.toString());
+                Log.e(TAG, "Get note id error :" + e);
                 throw new ActionFailureException("create note failed");
             }
         } else {

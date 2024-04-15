@@ -86,9 +86,9 @@ public class SqlNote {
 
     public static final int VERSION_COLUMN = 16;
 
-    private Context mContext;
+    private final Context mContext;
 
-    private ContentResolver mContentResolver;
+    private final ContentResolver mContentResolver;
 
     private boolean mIsCreate;
 
@@ -118,9 +118,9 @@ public class SqlNote {
 
     private long mVersion;
 
-    private ContentValues mDiffNoteValues;
+    private final ContentValues mDiffNoteValues;
 
-    private ArrayList<SqlData> mDataList;
+    private final ArrayList<SqlData> mDataList;
 
     public SqlNote(Context context) {
         mContext = context;
@@ -140,7 +140,7 @@ public class SqlNote {
         mOriginParent = 0;
         mVersion = 0;
         mDiffNoteValues = new ContentValues();
-        mDataList = new ArrayList<SqlData>();
+        mDataList = new ArrayList<>();
     }
 
     public SqlNote(Context context, Cursor c) {
@@ -148,7 +148,7 @@ public class SqlNote {
         mContentResolver = context.getContentResolver();
         mIsCreate = false;
         loadFromCursor(c);
-        mDataList = new ArrayList<SqlData>();
+        mDataList = new ArrayList<>();
         if (mType == Notes.TYPE_NOTE)
             loadDataContent();
         mDiffNoteValues = new ContentValues();
@@ -159,7 +159,7 @@ public class SqlNote {
         mContentResolver = context.getContentResolver();
         mIsCreate = false;
         loadFromCursor(id);
-        mDataList = new ArrayList<SqlData>();
+        mDataList = new ArrayList<>();
         if (mType == Notes.TYPE_NOTE)
             loadDataContent();
         mDiffNoteValues = new ContentValues();
@@ -167,21 +167,16 @@ public class SqlNote {
     }
 
     private void loadFromCursor(long id) {
-        Cursor c = null;
-        try {
-            c = mContentResolver.query(Notes.CONTENT_NOTE_URI, PROJECTION_NOTE, "(_id=?)",
-                    new String[] {
+        try (Cursor c = mContentResolver.query(Notes.CONTENT_NOTE_URI, PROJECTION_NOTE, "(_id=?)",
+                new String[]{
                         String.valueOf(id)
-                    }, null);
+                }, null)) {
             if (c != null) {
                 c.moveToNext();
                 loadFromCursor(c);
             } else {
                 Log.w(TAG, "loadFromCursor: cursor = null");
             }
-        } finally {
-            if (c != null)
-                c.close();
         }
     }
 
@@ -201,13 +196,11 @@ public class SqlNote {
     }
 
     private void loadDataContent() {
-        Cursor c = null;
         mDataList.clear();
-        try {
-            c = mContentResolver.query(Notes.CONTENT_DATA_URI, SqlData.PROJECTION_DATA,
-                    "(note_id=?)", new String[] {
+        try (Cursor c = mContentResolver.query(Notes.CONTENT_DATA_URI, SqlData.PROJECTION_DATA,
+                "(note_id=?)", new String[]{
                         String.valueOf(mId)
-                    }, null);
+                }, null)) {
             if (c != null) {
                 if (c.getCount() == 0) {
                     Log.w(TAG, "it seems that the note has not data");
@@ -220,9 +213,6 @@ public class SqlNote {
             } else {
                 Log.w(TAG, "loadDataContent: cursor = null");
             }
-        } finally {
-            if (c != null)
-                c.close();
         }
     }
 
@@ -448,9 +438,9 @@ public class SqlNote {
 
             Uri uri = mContentResolver.insert(Notes.CONTENT_NOTE_URI, mDiffNoteValues);
             try {
-                mId = Long.valueOf(uri.getPathSegments().get(1));
+                mId = Long.parseLong(uri.getPathSegments().get(1));
             } catch (NumberFormatException e) {
-                Log.e(TAG, "Get note id error :" + e.toString());
+                Log.e(TAG, "Get note id error :" + e);
                 throw new ActionFailureException("create note failed");
             }
             if (mId == 0) {

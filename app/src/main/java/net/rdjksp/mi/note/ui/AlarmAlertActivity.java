@@ -64,7 +64,7 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
         Intent intent = getIntent();
 
         try {
-            mNoteId = Long.valueOf(intent.getData().getPathSegments().get(1));
+            mNoteId = Long.parseLong(intent.getData().getPathSegments().get(1));
             mSnippet = DataUtils.getSnippetById(this.getContentResolver(), mNoteId);
             mSnippet = mSnippet.length() > SNIPPET_PREW_MAX_LEN ? mSnippet.substring(0,
                     SNIPPET_PREW_MAX_LEN) + getResources().getString(R.string.notelist_string_info)
@@ -104,16 +104,8 @@ public class AlarmAlertActivity extends Activity implements OnClickListener, OnD
             mPlayer.prepare();
             mPlayer.setLooping(true);
             mPlayer.start();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException | IllegalStateException |
+                 SecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

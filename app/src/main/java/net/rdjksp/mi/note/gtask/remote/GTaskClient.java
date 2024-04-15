@@ -143,8 +143,8 @@ public class GTaskClient {
             int index = mAccount.name.indexOf('@') + 1;
             String suffix = mAccount.name.substring(index);
             url.append(suffix + "/");
-            mGetUrl = url.toString() + "ig";
-            mPostUrl = url.toString() + "r/ig";
+            mGetUrl = url + "ig";
+            mPostUrl = url + "r/ig";
 
             if (tryToLoginGtask(activity, authToken)) {
                 mLoggedin = true;
@@ -331,7 +331,7 @@ public class GTaskClient {
 
         HttpPost httpPost = createHttpPost();
         try {
-            LinkedList<BasicNameValuePair> list = new LinkedList<BasicNameValuePair>();
+            LinkedList<BasicNameValuePair> list = new LinkedList<>();
             list.add(new BasicNameValuePair("r", js.toString()));
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(list, "UTF-8");
             httpPost.setEntity(entity);
@@ -341,10 +341,6 @@ public class GTaskClient {
             String jsString = getResponseContent(response.getEntity());
             return new JSONObject(jsString);
 
-        } catch (ClientProtocolException e) {
-            Log.e(TAG, e.toString());
-            e.printStackTrace();
-            throw new NetworkFailureException("postRequest failed");
         } catch (IOException e) {
             Log.e(TAG, e.toString());
             e.printStackTrace();
@@ -532,10 +528,6 @@ public class GTaskClient {
             }
             JSONObject js = new JSONObject(jsString);
             return js.getJSONObject("t").getJSONArray(GTaskStringUtils.GTASK_JSON_LISTS);
-        } catch (ClientProtocolException e) {
-            Log.e(TAG, e.toString());
-            e.printStackTrace();
-            throw new NetworkFailureException("gettasklists: httpget failed");
         } catch (IOException e) {
             Log.e(TAG, e.toString());
             e.printStackTrace();

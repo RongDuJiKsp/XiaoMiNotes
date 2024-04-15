@@ -31,19 +31,19 @@ import net.rdjksp.mi.note.ui.NotesPreferenceActivity;
 
 public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
 
-    private static int GTASK_SYNC_NOTIFICATION_ID = 5234235;
+    private static final int GTASK_SYNC_NOTIFICATION_ID = 5234235;
 
     public interface OnCompleteListener {
         void onComplete();
     }
 
-    private Context mContext;
+    private final Context mContext;
 
-    private NotificationManager mNotifiManager;
+    private final NotificationManager mNotifiManager;
 
-    private GTaskManager mTaskManager;
+    private final GTaskManager mTaskManager;
 
-    private OnCompleteListener mOnCompleteListener;
+    private final OnCompleteListener mOnCompleteListener;
 
     public GTaskASyncTask(Context context, OnCompleteListener listener) {
         mContext = context;
@@ -115,12 +115,7 @@ public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
                     .getString(R.string.error_sync_cancelled));
         }
         if (mOnCompleteListener != null) {
-            new Thread(new Runnable() {
-
-                public void run() {
-                    mOnCompleteListener.onComplete();
-                }
-            }).start();
+            new Thread(() -> mOnCompleteListener.onComplete()).start();
         }
     }
 }

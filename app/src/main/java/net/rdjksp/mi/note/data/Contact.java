@@ -38,7 +38,7 @@ public class Contact {
 
     public static String getContact(Context context, String phoneNumber) {
         if(sContactCache == null) {
-            sContactCache = new HashMap<String, String>();
+            sContactCache = new HashMap<>();
         }
 
         if(sContactCache.containsKey(phoneNumber)) {
@@ -60,7 +60,7 @@ public class Contact {
                 sContactCache.put(phoneNumber, name);
                 return name;
             } catch (IndexOutOfBoundsException e) {
-                Log.e(TAG, " Cursor get string error " + e.toString());
+                Log.e(TAG, " Cursor get string error " + e);
                 return null;
             } finally {
                 cursor.close();

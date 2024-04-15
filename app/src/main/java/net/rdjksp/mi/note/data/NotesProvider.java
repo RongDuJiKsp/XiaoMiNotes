@@ -73,7 +73,7 @@ public class NotesProvider extends ContentProvider {
         + "'" + Intent.ACTION_VIEW + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_ACTION + ","
         + "'" + Notes.TextNote.CONTENT_TYPE + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA;
 
-    private static String NOTES_SNIPPET_SEARCH_QUERY = "SELECT " + NOTES_SEARCH_PROJECTION
+    private static final String NOTES_SNIPPET_SEARCH_QUERY = "SELECT " + NOTES_SEARCH_PROJECTION
         + " FROM " + TABLE.NOTE
         + " WHERE " + NoteColumns.SNIPPET + " LIKE ?"
         + " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER
@@ -135,7 +135,7 @@ public class NotesProvider extends ContentProvider {
                     c = db.rawQuery(NOTES_SNIPPET_SEARCH_QUERY,
                             new String[] { searchString });
                 } catch (IllegalStateException ex) {
-                    Log.e(TAG, "got exception: " + ex.toString());
+                    Log.e(TAG, "got exception: " + ex);
                 }
                 break;
             default:
@@ -159,7 +159,7 @@ public class NotesProvider extends ContentProvider {
                 if (values.containsKey(DataColumns.NOTE_ID)) {
                     noteId = values.getAsLong(DataColumns.NOTE_ID);
                 } else {
-                    Log.d(TAG, "Wrong data format without note id:" + values.toString());
+                    Log.d(TAG, "Wrong data format without note id:" + values);
                 }
                 insertedId = dataId = db.insert(TABLE.DATA, null, values);
                 break;
@@ -194,11 +194,11 @@ public class NotesProvider extends ContentProvider {
                 break;
             case URI_NOTE_ITEM:
                 id = uri.getPathSegments().get(1);
-                /**
-                 * ID that smaller than 0 is system folder which is not allowed to
-                 * trash
+                /*
+                  ID that smaller than 0 is system folder which is not allowed to
+                  trash
                  */
-                long noteId = Long.valueOf(id);
+                long noteId = Long.parseLong(id);
                 if (noteId <= 0) {
                     break;
                 }
@@ -240,7 +240,7 @@ public class NotesProvider extends ContentProvider {
                 break;
             case URI_NOTE_ITEM:
                 id = uri.getPathSegments().get(1);
-                increaseNoteVersion(Long.valueOf(id), selection, selectionArgs);
+                increaseNoteVersion(Long.parseLong(id), selection, selectionArgs);
                 count = db.update(TABLE.NOTE, values, NoteColumns.ID + "=" + id
                         + parseSelection(selection), selectionArgs);
                 break;
@@ -283,7 +283,7 @@ public class NotesProvider extends ContentProvider {
             sql.append(" WHERE ");
         }
         if (id > 0) {
-            sql.append(NoteColumns.ID + "=" + String.valueOf(id));
+            sql.append(NoteColumns.ID + "=" + id);
         }
         if (!TextUtils.isEmpty(selection)) {
             String selectString = id > 0 ? parseSelection(selection) : selection;

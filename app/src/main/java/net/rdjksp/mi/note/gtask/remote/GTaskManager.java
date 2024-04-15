@@ -73,30 +73,30 @@ public class GTaskManager {
 
     private boolean mCancelled;
 
-    private HashMap<String, TaskList> mGTaskListHashMap;
+    private final HashMap<String, TaskList> mGTaskListHashMap;
 
-    private HashMap<String, Node> mGTaskHashMap;
+    private final HashMap<String, Node> mGTaskHashMap;
 
-    private HashMap<String, MetaData> mMetaHashMap;
+    private final HashMap<String, MetaData> mMetaHashMap;
 
     private TaskList mMetaList;
 
-    private HashSet<Long> mLocalDeleteIdMap;
+    private final HashSet<Long> mLocalDeleteIdMap;
 
-    private HashMap<String, Long> mGidToNid;
+    private final HashMap<String, Long> mGidToNid;
 
-    private HashMap<Long, String> mNidToGid;
+    private final HashMap<Long, String> mNidToGid;
 
     private GTaskManager() {
         mSyncing = false;
         mCancelled = false;
-        mGTaskListHashMap = new HashMap<String, TaskList>();
-        mGTaskHashMap = new HashMap<String, Node>();
-        mMetaHashMap = new HashMap<String, MetaData>();
+        mGTaskListHashMap = new HashMap<>();
+        mGTaskHashMap = new HashMap<>();
+        mMetaHashMap = new HashMap<>();
         mMetaList = null;
-        mLocalDeleteIdMap = new HashSet<Long>();
-        mGidToNid = new HashMap<String, Long>();
-        mNidToGid = new HashMap<Long, String>();
+        mLocalDeleteIdMap = new HashSet<>();
+        mGidToNid = new HashMap<>();
+        mNidToGid = new HashMap<>();
     }
 
     public static synchronized GTaskManager getInstance() {
@@ -327,9 +327,7 @@ public class GTaskManager {
         }
 
         // go through remaining items
-        Iterator<Map.Entry<String, Node>> iter = mGTaskHashMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, Node> entry = iter.next();
+        for (Map.Entry<String, Node> entry : mGTaskHashMap.entrySet()) {
             node = entry.getValue();
             doContentSync(Node.SYNC_ACTION_ADD_LOCAL, node, null);
         }
@@ -461,9 +459,7 @@ public class GTaskManager {
         }
 
         // for remote add folders
-        Iterator<Map.Entry<String, TaskList>> iter = mGTaskListHashMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, TaskList> entry = iter.next();
+        for (Map.Entry<String, TaskList> entry : mGTaskListHashMap.entrySet()) {
             gid = entry.getKey();
             node = entry.getValue();
             if (mGTaskHashMap.containsKey(gid)) {
@@ -581,7 +577,7 @@ public class GTaskManager {
                 Log.e(TAG, "cannot find task's parent id locally");
                 throw new ActionFailureException("cannot add local node");
             }
-            sqlNote.setParentId(parentId.longValue());
+            sqlNote.setParentId(parentId);
         }
 
         // create the local node
@@ -612,7 +608,7 @@ public class GTaskManager {
             Log.e(TAG, "cannot find task's parent id locally");
             throw new ActionFailureException("cannot update local node");
         }
-        sqlNote.setParentId(parentId.longValue());
+        sqlNote.setParentId(parentId);
         sqlNote.commit(true);
 
         // update meta info
@@ -656,17 +652,13 @@ public class GTaskManager {
             else
                 folderName += sqlNote.getSnippet();
 
-            Iterator<Map.Entry<String, TaskList>> iter = mGTaskListHashMap.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<String, TaskList> entry = iter.next();
+            for (Map.Entry<String, TaskList> entry : mGTaskListHashMap.entrySet()) {
                 String gid = entry.getKey();
                 TaskList list = entry.getValue();
 
                 if (list.getName().equals(folderName)) {
                     tasklist = list;
-                    if (mGTaskHashMap.containsKey(gid)) {
-                        mGTaskHashMap.remove(gid);
-                    }
+                    mGTaskHashMap.remove(gid);
                     break;
                 }
             }

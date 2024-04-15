@@ -33,19 +33,19 @@ import java.util.Iterator;
 
 public class NotesListAdapter extends CursorAdapter {
     private static final String TAG = "NotesListAdapter";
-    private Context mContext;
-    private HashMap<Integer, Boolean> mSelectedIndex;
+    private final Context mContext;
+    private final HashMap<Integer, Boolean> mSelectedIndex;
     private int mNotesCount;
     private boolean mChoiceMode;
 
     public static class AppWidgetAttribute {
         public int widgetId;
         public int widgetType;
-    };
+    }
 
     public NotesListAdapter(Context context) {
         super(context, null);
-        mSelectedIndex = new HashMap<Integer, Boolean>();
+        mSelectedIndex = new HashMap<>();
         mContext = context;
         mNotesCount = 0;
     }
@@ -90,9 +90,9 @@ public class NotesListAdapter extends CursorAdapter {
     }
 
     public HashSet<Long> getSelectedItemIds() {
-        HashSet<Long> itemSet = new HashSet<Long>();
+        HashSet<Long> itemSet = new HashSet<>();
         for (Integer position : mSelectedIndex.keySet()) {
-            if (mSelectedIndex.get(position) == true) {
+            if (mSelectedIndex.get(position)) {
                 Long id = getItemId(position);
                 if (id == Notes.ID_ROOT_FOLDER) {
                     Log.d(TAG, "Wrong item id, should not happen");
@@ -106,9 +106,9 @@ public class NotesListAdapter extends CursorAdapter {
     }
 
     public HashSet<AppWidgetAttribute> getSelectedWidget() {
-        HashSet<AppWidgetAttribute> itemSet = new HashSet<AppWidgetAttribute>();
+        HashSet<AppWidgetAttribute> itemSet = new HashSet<>();
         for (Integer position : mSelectedIndex.keySet()) {
-            if (mSelectedIndex.get(position) == true) {
+            if (mSelectedIndex.get(position)) {
                 Cursor c = (Cursor) getItem(position);
                 if (c != null) {
                     AppWidgetAttribute widget = new AppWidgetAttribute();
@@ -116,8 +116,8 @@ public class NotesListAdapter extends CursorAdapter {
                     widget.widgetId = item.getWidgetId();
                     widget.widgetType = item.getWidgetType();
                     itemSet.add(widget);
-                    /**
-                     * Don't close cursor here, only the adapter could close it
+                    /*
+                      Don't close cursor here, only the adapter could close it
                      */
                 } else {
                     Log.e(TAG, "Invalid cursor");
@@ -136,7 +136,7 @@ public class NotesListAdapter extends CursorAdapter {
         Iterator<Boolean> iter = values.iterator();
         int count = 0;
         while (iter.hasNext()) {
-            if (true == iter.next()) {
+            if (iter.next()) {
                 count++;
             }
         }

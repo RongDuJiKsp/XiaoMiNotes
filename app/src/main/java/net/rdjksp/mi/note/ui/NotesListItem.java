@@ -31,12 +31,12 @@ import net.rdjksp.mi.note.tool.ResourceParser.NoteItemBgResources;
 
 
 public class NotesListItem extends LinearLayout {
-    private ImageView mAlert;
-    private TextView mTitle;
-    private TextView mTime;
-    private TextView mCallName;
+    private final ImageView mAlert;
+    private final TextView mTitle;
+    private final TextView mTime;
+    private final TextView mCallName;
     private NoteItemData mItemData;
-    private CheckBox mCheckBox;
+    private final CheckBox mCheckBox;
 
     public NotesListItem(Context context) {
         super(context);
