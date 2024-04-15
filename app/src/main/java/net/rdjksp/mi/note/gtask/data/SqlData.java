@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/*
+ * Description：用于支持小米便签最底层的数据库相关操作，和sqlnote的关系上是子集关系，即data是note的子集（节点）。
+ * SqlData其实就是也就是所谓数据中的数据
+ */
+
 package net.rdjksp.mi.note.gtask.data;
 
 import android.content.ContentResolver;
@@ -36,6 +41,10 @@ import org.json.JSONObject;
 
 
 public class SqlData {
+    /*
+     * 功能描述：得到类的简写名称存入字符串TAG中
+     * 实现过程：调用getSimpleName ()函数
+     */
     private static final String TAG = SqlData.class.getSimpleName();
 
     private static final int INVALID_ID = -99999;
