@@ -35,7 +35,15 @@ public class Contact {
             + "(SELECT raw_contact_id "
             + " FROM phone_lookup"
             + " WHERE min_match = '+')";
-
+/*
+1. 检查静态缓存 `sContactCache` 是否为空，如果是，则初始化一个 `HashMap`。
+2. 检查缓存中是否已经包含传入的 `phoneNumber`，如果包含，则直接返回缓存中的联系人名称。
+3. 如果缓存中没有找到对应的联系人，则准备一个SQL查询条件 `selection`，这个条件使用了 `PhoneNumberUtils.toCallerIDMinMatch` 方法来处理国际格式电话号码的匹配问题。
+4. 使用 `context.getContentResolver().query` 方法查询 `Data.CONTENT_URI`，它代表了联系人数据的内容URI。查询的列只包括 `Phone.DISPLAY_NAME`，即联系人的显示名称。
+5. 如果有查询结果且移动到第一条记录，则尝试获取联系人的名称，并将其存储在 `sContactCache` 中，然后返回这个名称。
+6. 如果查询结果为空或者在尝试获取联系人名称时出现 `IndexOutOfBoundsException` 异常，则记录错误日志并返回 `null`。
+7. 最后，无论查询成功与否，都会关闭游标以释放资源。
+ */
     public static String getContact(Context context, String phoneNumber) {
         if(sContactCache == null) {
             sContactCache = new HashMap<>();
