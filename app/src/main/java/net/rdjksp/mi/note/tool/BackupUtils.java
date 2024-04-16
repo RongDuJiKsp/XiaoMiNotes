@@ -287,9 +287,9 @@ public class BackupUtils {
          */
          /*
         getExportToTextPrintStream()方法的作用如下：
-        1. 使用`generateFileMountedOnSDcard()`方法创建一个位于SD卡上的文件，文件路径和名称似乎是根据资源ID动态生成的。
-        2. 如果文件创建失败，即`file`为`null`，则记录一个错误日志并返回`null`。
-        3. 如果文件创建成功，则将文件名和目录存储在成员变量`mFileName`和`mFileDirectory`中。
+        1. 使用`generateFileMou为`null`，则记录一个错误日志并返回`null`。
+        3. 如果文件创建成功，则将文件名ntedOnSDcard()`方法创建一个位于SD卡上的文件，文件路径和名称似乎是根据资源ID动态生成的。
+        2. 如果文件创建失败，即`file`和目录存储在成员变量`mFileName`和`mFileDirectory`中。
         4. 尝试打开一个`FileOutputStream`，用以写入文件。
         5. 使用`PrintStream`包装`FileOutputStream`，这样就可以向文件中写入文本数据。
         6. 如果任何步骤中出现`FileNotFoundException`或`NullPointerException`异常，都将打印堆栈跟踪并返回`null`。
