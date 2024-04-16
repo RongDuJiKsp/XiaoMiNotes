@@ -35,6 +35,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 
+/*
+
+* 方法名为`batchDeleteNotes`，接收两个参数：一个`ContentResolver`对象和一个包含要删除的笔记ID的`HashSet`。
+* 首先，代码检查输入的`HashSet`是否为空，或者其中的ID是否为null。如果任何一个条件满足，方法就会直接返回。
+* 如果输入有效，方法会创建一个`ArrayList`来保存将要执行的`ContentProviderOperation`操作。每个操作都是一个意图在指定笔记URI上删除内容的操作。
+* 代码遍历HashSet中的每个ID，如果ID等于`Notes.ID_ROOT_FOLDER`（系统文件夹根），则跳过该ID并记录一条错误日志。
+* 对于每个非根ID，它都会创建一个新的删除操作并添加到操作列表中。
+* 然后，尝试将这个操作列表应用到一个批处理操作中。如果批处理操作成功，方法返回true；否则，捕获并处理任何可能的异常（如远程异常或操作应用异常），并返回false。
+
+总的来说，这段代码的主要功能是批量删除指定ID的笔记。需要注意的是，这个方法会跳过系统文件夹根，并且只有在批处理操作成功时才会返回true。如果在批处理过程中出现任何异常，它都会捕获并记录错误信息。
+ */
 public class DataUtils {
     public static final String TAG = "DataUtils";
     public static boolean batchDeleteNotes(ContentResolver resolver, HashSet<Long> ids) {
