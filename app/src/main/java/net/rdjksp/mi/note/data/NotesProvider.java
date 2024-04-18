@@ -86,6 +86,14 @@ public class NotesProvider extends ContentProvider {
     }
 
     @Override
+    /*
+
+1. 根据传入的URI匹配不同的操作：包括查询所有笔记、查询单个笔记、查询所有数据、查询单个数据、搜索笔记内容。
+2. 查询笔记的操作会根据传入的条件进行过滤，返回匹配的笔记列表。
+3. 查询数据的操作也会根据传入的条件进行过滤，返回匹配的数据列表。
+4. 搜索操作会根据传入的搜索关键字进行模糊搜索，返回符合条件的笔记列表。
+5. 最后会将查询结果的Cursor对象设置监听URI，以便在数据发生变化时能够及时通知相关观察者。
+     */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         Cursor c = null;
